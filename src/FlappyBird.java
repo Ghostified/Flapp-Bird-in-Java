@@ -1,7 +1,12 @@
 import javax.swing.*;
-import java.awt.*;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
 
-public class FlappyBird extends JPanel {
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+
+public class FlappyBird extends JPanel implements ActionListener{
     int boardWidth = 360;
     int boardHeight = 640;
 
@@ -35,6 +40,17 @@ public class FlappyBird extends JPanel {
     //Game Logic
     Bird bird;
 
+    //Make the bird move by adding a velocity
+    //upward movement in the y axis is negative
+    //downward movement in the y axis = positive
+    //forward is +x
+    //backward is -x
+    int velocityY = -6;
+    int velocityX = 6;
+
+    //Loop to draw the bird in each frame -60fps
+    Timer gameLoopTimer;
+
     FlappyBird(){
         setPreferredSize(new Dimension(boardWidth, boardHeight));
         //setBackground(Color.blue);
@@ -46,6 +62,11 @@ public class FlappyBird extends JPanel {
         bottomPipeImg = new ImageIcon(getClass().getResource("./Images/bottompipe.png")).getImage();
 
         bird = new Bird(birdImg);
+
+        //CReate a Timer object in ms , 1000ms = 1sec
+        //draw at 60 fpf
+        gameLoopTimer = new Timer(1000/60, this);
+        gameLoopTimer.start();
     }
 
     //Draw the background
@@ -55,10 +76,27 @@ public class FlappyBird extends JPanel {
     }
 
     public  void draw(Graphics g){
+        //debugger for the timer 
+        System.out.println("draw");
         //draw the background
         g.drawImage(backgroundImg, 0,0,boardWidth, boardHeight, null);
 
         //draw Bird
         g.drawImage(bird.img, bird.x,bird.y,bird.width,bird.height,null);
+    }
+
+    //move function
+    public void move(){
+        //bird 
+        bird.y += velocityY;
+        bird.x += velocityX;
+    }
+
+    //paint component function these actions are  performed at 60fps in a loop
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        //UPDATE BIRD POSITION BEFORE REPAINT
+        move();
+        repaint();
     }
 }
